@@ -1,0 +1,335 @@
+---
+title: "Examen Final Estadistica II"
+author: "Arnold David Bernabe Jeronimo Mijangos"
+date: "3/6/2021"
+output: word_document
+---
+
+## Librerias
+```{r}
+require(stats)
+library(dplyr)
+library(readr)
+library(normtest)
+library(nortest)
+library(ggplot2)
+library(lubridate)
+library(forecast)
+library(tidyverse)
+```
+
+## Datasets a Utilizar 
+```{r}
+Auts <- read_csv("C:/Users/David/Documents/Proyectos/ExamFinalEst/AutosSegundaMano.csv")
+Netflix <- read_csv("C:/Users/David/Documents/Proyectos/ExamFinalEst/netflix.csv")
+Co2Est <- read_csv("C:/Users/David/Documents/Proyectos/ExamFinalEst/archive.csv")
+```
+
+## Analisis exploratorio de los datos 
+
+## Dataset AutosSegundaManos.csv
+
+Para el dataset de Autos de segunda mano en venta tenemos los siguientes datos:
+
+```{r}
+str(Auts)
+head(Auts)
+summary(Auts)
+```
+
+En el cual podemos observar que de parte de las variables cualitativas tenemos: Url, Company, make, model, version, fuel, shift, color, dealer, province, country.
+
+En el apartado de las variables cuantitativas tenemos: price, price_financed, year, kms, power, doors, photos.
+
+y tambien podemos observar que contamos con variables de tipo fecha las cuales son: publish_date e instert_date.
+
+## Conclusion: 
+
+podemos observar que se cuenta con un dataset variado, el cual presenta tanto variables cualitativas como cuantitativas y de fecha, por lo tanto aun teniendo variables inutilizables para este analisis como lo son Url y Company podemos analizar datos relevantes.
+
+## Dataset netflix.csv
+
+Para el dataset de Catalogo de netflix y su metascore tenemos los siguientes datos:
+
+```{r}
+str(Netflix)
+head(Netflix)
+summary(Netflix)
+```
+
+En el cual podemos observar que de parte de las variables cualitativas tenemos: Title, Genre, Tags, languages, Series or Movie, Country Availability, Runtime, Director, Writer, Actors, View Rating, Boxoffice, release date, production House, netflix link, imdb link, sumary, Image, Poster, imdb trailer, trailer Site.
+
+En el apartado de las variables cuantitativas tenemos: Hiden Gem Score, IMDb Score, Rotten tomatoes Score, Awards Reicivedm Awards nominated for, Imdb votes.
+
+y tambien podemos observar que contamos con una variable de tipo fecha la cual es Netflix Release Date, la cual para este analisis no sera de mucha relevancia ya que la fecha es de cuando se tomaron los datos por lo cual no tiene mayor repercusion en el set de datos.
+
+## Dataset Co2Est
+se realizo la inclusion de este dataset para desarrollar de la mejor manera las series de tiempo
+
+```{r}
+str(Co2Est)
+head(Co2Est)
+summary(Co2Est)
+```
+Asi que como se pudo observar el dataset nadamas cuenta con datos de fechas y emision de Co2.
+
+
+## Analisis de Normalidad de los datos (Netflix$`Hidden Gem Score`)
+
+Para el dataset Netflix, determinar si existe normalidad en los datos de la variable Hidden Gem Score.
+
+Modelo = Analisis de normalidad de los datos de Pearson.
+
+Grafico = Histograma.
+
+Hipotesis. 
+H0 = La Variable Hidden Gem Score posee una normalidad en los datos 
+H1 = La Variable Hidden Gem Score NO posee una normalidad en los datos 
+
+
+```{r}
+hist(Netflix$`Hidden Gem Score`)
+pearson.test(Netflix$`Hidden Gem Score`)
+```
+
+Pvalue 2.2e-16 es menor a 0.05 por lo tanto se rechaza H0.
+
+Conclusion: debido a que el pvalue es menor a el nivel de significancia rechazamos nuestra H0 por lo tanto podemos determinar que no hay una normalidad en los datos.
+
+## Analisis de Medias (Auts$photos)
+
+Para el dataset de Autos determinar la media de fotos que las personas suben al vender su auto.
+
+Modelo = Mean, analisis de medias.
+
+Grafico = Histograma.
+
+
+```{r}
+hist(Auts$photos,col = ("red"))
+mediaphotos <- mean(Auts$photos)
+abline(v=mediaphotos,col="green")
+```
+
+Conclusion: podemos determinar que la media de fotos que las personas suben a la hora de intentar vender sus autos usados es de 16, y que estas rondan entre las 0 y las 55.
+
+## Analisis de Medias (Auts$photos)
+
+Para el dataset de Netflix determinar la media de Calificacion en IMDB.
+
+Modelo = Mean, analisis de medias.
+
+Grafico = Histograma.
+
+
+```{r}
+hist(Netflix$`IMDb Score`,col = ("red"))
+mediaIMDB <- mean(Netflix$`IMDb Score`)
+abline(v=mediaIMDB,col="green")
+```
+
+Conclusiones: Podemos determinar que la media de puntuacion del catalogo de netflix en IMDb es de 7, y que a su vez es poco contenido en el catalogo que tiene una puntuacion menor a 3.
+
+
+## Analisis de Correlacion (Auts$power y Auts$year)
+
+Determinar si existe una relacion entre el Poder de los automoviles y el año de fabricacion.
+
+Modelo = Plot.
+
+Grafico = Correlacion.
+
+H0 = No existe relacion entre el Poder y el año de fabricacion del vehiculo. 
+
+H1 = Existe una relacion entre el Poder y el año de fabricacion del vehiculo.  
+
+
+```{r}
+plot(Auts$year,Auts$power,col="blue",main="Correlacion entre Precio y año de fabricacion ",xlab="Año",ylab="Poder")
+abline(lm(Auts$power ~ Auts$year), col = 'red', lwd = 3)
+cor(Auts$year,Auts$power)
+```
+
+Indice de Correlacion =Na por lo tanto se acepta la hipotesis nula.
+
+Conclusion: Podemos determinar gracias al indice de correlacion (NA) que no existe una relacion estrecha entre el año de fabricacion y el poder de los vehiculos 
+
+
+## Analisis de Correlacion (Netflix$`Hidden Gem Score` y Netflix$`IMDb Score`)
+
+Determinar si existe una relacion entre La calificacion interna de netflix y la de IMDb.
+
+Modelo = Plot.
+
+Grafico = Correlacion.
+
+H0 = No existe relacion entre La calificacion interna de netflix y la de IMDb. 
+
+H1 = Existe una relacion entre La calificacion interna de netflix y la de IMDb.  
+
+
+```{r}
+plot(Netflix$`Hidden Gem Score`,Netflix$`IMDb Score`,col="blue",main="Correlacion entre Calificacion interna de netflix y de IMDb ",xlab="Hidden Gem Score",ylab="IMDb Score")
+abline(lm(Netflix$`IMDb Score` ~ Netflix$`Hidden Gem Score`), col = 'red', lwd = 3)
+cor(Netflix$`Hidden Gem Score`,Netflix$`IMDb Score`)
+```
+Indice de Correlacion =Na por lo tanto se acepta la hipotesis nula.
+
+Conclusion: Podemos determinar gracias al indice de correlacion (NA) que no existe una relacion entre la calificacion interna que tiene netflix y la que se le ha otorgado en IMDb.
+
+## Analisis de Correlacion (Netflix$`Hidden Gem Score` y Netflix$`IMDb Score`)
+
+Determinar si existe una relacion entre La calificacion interna de netflix y la de IMDb.
+
+Modelo = Plot.
+
+Grafico = Correlacion.
+
+H0 = No existe relacion entre La calificacion interna de netflix y la de IMDb. 
+
+H1 = Existe una relacion entre La calificacion interna de netflix y la de IMDb.  
+
+
+```{r}
+plot(Netflix$`IMDb Votes`,Netflix$`IMDb Score`,col="blue",main="Correlacion entre votos en IMDb y puntuacion de IMDb ",xlab="IMDb Votes",ylab="IMDb Score")
+abline(lm(Netflix$`IMDb Score` ~ Netflix$`IMDb Votes`), col = 'red', lwd = 3)
+cor(Netflix$`IMDb Votes`,Netflix$`IMDb Score`)
+```
+Indice de Correlacion =Na por lo tanto se acepta la hipotesis nula.
+
+Conclusion: Podemos determinar que aunque al principio de la grafica pareciese que mientras menos personas hayan votado sera mayor la puntuacion la realidad es que no son variables dependientes.
+
+
+## Analisis de Prueba de medias con T.test (Auts$power y Auts$shift)
+
+determinar tanto grafica como analiticamente si existe una diferencia significativa entre el tipo de cambio y el poder del vehiculo.
+
+Modelo = T.test.
+
+Grafica = Boxplot.
+
+H0 = no existe una diferencia significativa entre las medias de tipo de cambio y el poder del vehiculo.
+
+H1 = si existe una diferencia significativa entre las medias de tipo de cambio y el poder del vehiculo.
+```{r}
+boxplot(power~shift, data=Auts, col=c("red","blue"))
+t.test(Auts$power~Auts$shift, alternative="two.sided")
+```
+pvalue (2.2e-16) menor a 0.05 se rechaza la H0.
+
+Conclusiones: debido a que el pvalue es menor al nivel de significancia se rechaza la hipotesis nula, por lo tanto podemos determinar que existe una diferencia entre las medias de poder en base al tipo de cambio, teniendo un mayor poder los automoviles Automaticos
+
+## Analisis de Prueba de medias con T.test (Netflix$`Hidden Gem Score` y Netflix$`Series or Movie`)
+
+determinar tanto grafica como analiticamente si existe una diferencia significativa entre (Movie or Serie) y hidden Gem Score (calificacion interna de netflix).
+ 
+Modelo = T.test.
+
+Grafica = Boxplot.
+
+H0 = no existe una diferencia significativa entre (Movie or Serie) y hidden Gem Score (calificacion interna de netflix).
+
+H1 = si existe una diferencia significativa entre (Movie or Serie) y hidden Gem Score (calificacion interna de netflix).
+```{r}
+boxplot(`Hidden Gem Score`~`Series or Movie`, data=Netflix, col=c("red","blue"))
+t.test(Netflix$`Hidden Gem Score`~Netflix$`Series or Movie`, alternative="two.sided")
+```
+pvalue (2.2e-16) menor a 0.05 se rechaza la H0.
+
+Conclusiones: debido a que el pvalue es menor al nivel de significancia se rechaza la hipotesis nula, por lo tanto podemos determinar que existe una diferencia significativa entre las medias de calificacion de las peliculas y las series de netflix  siendo las series las mas puntuadas
+
+## Análisis de Prueba de medias con multiples variables (Fuel y kms de Auts)
+
+Examinar tanto de forma grafica como analitica la relacion que existe entre el tipo de combustible y los kms recorridos.
+
+Modelo = Anova.
+
+Grafica = Boxplot.
+
+H0 = No existe relacion entre el tipo de combustible y los km recorridos.
+
+H1 = Existe relacion entre el tipo de combustible y los km recorridos.
+
+
+```{r}
+ggplot(data= Auts, aes(x=kms, y=fuel,color=fuel ))+geom_boxplot()+theme_bw()
+anova <- aov(Auts$kms~Auts$fuel)
+summary(anova)
+```
+debido a que el pvalue 2e-16 es menor a 0.05 se rechaza la H0.
+
+Conclusiones: en base a que el pvalue es menor a 0.05 se puede determinar que existe una relacion significativa entre el tipo de combustible y los kilometros recorridos. 
+
+
+## Análisis de Prueba de medias con multiples variables (Runtime e IMDb Score)
+
+Examinar tanto de forma grafica como analitica la relacion que existe entre la duracion de una pelicula o serie y la puntuacion que le dan los usuarios en IMDb.
+
+Modelo = Anova.
+
+Grafica = Boxplot.
+
+H0 = No existe relacion entre la duracion de una pelicula o serie y la puntuacion que le dan los usuarios en IMDb.
+
+H1 = Existe relacion entre la duracion de una pelicula o serie y la puntuacion que le dan los usuarios en IMDb.
+
+
+```{r}
+ggplot(data= Netflix, aes(x=`IMDb Score`, y=Runtime,color=Runtime ))+geom_boxplot()+theme_bw()
+anova <- aov(Netflix$`IMDb Score`~Netflix$Runtime)
+summary(anova)
+```
+
+debido a que el pvalue 2e-16 es menor a 0.05 se rechaza la H0.
+
+Conclusiones: en base a que el pvalue es menor a 0.05 se puede determinar que existe una relacion significativa Entre el tiempo que dura una pelicula o serie y que tan bien puntuada este, siendo las que duran menos de 30 minutos las mas populares. 
+
+## Análisis de ChiCuadrado (Auts$is_profesional y Auts$fuel)
+
+Examinar tanto grafica como analiticamente la relacion entre el tipo de combustible y si en vendedor es profesional, y determine si existe una diferencia significativa entre las variables
+
+Modelo = Test chi cuadrado.
+
+Grafica = Mosaic plot.
+
+H0 = no existe relacion entre las variables tipo de combustible y vendedor.
+
+H1 = existe relacion entre las variables tipo de combustible y vendedor.
+
+```{r}
+tabla <- table(Auts$fuel,Auts$is_professional, dnn=c("Tipo de Combustible","Vendedor Profesional"))
+mosaicplot(tabla, main = deparse("Relación entre Tipo de Combustible y Vendedor Profesional"))
+tabla
+chisq.test(tabla)
+```
+
+el p-value (2.2e-16) es menor a 0.05 por lo cual se rechaza H0.
+
+Conclusiones: podemos determinar debido a que el pvalues es menor a 0.05 que existe una relacion entre el tipo de combustible y si el vendedor es o no profesional 
+
+## Análisis de Series de tiempo (Emision de Co2)
+
+Para el dataset Co2Est realizar un analisis detallado de lines de tiempo en base a la emision de C02
+
+```{r}
+co2ts <- ts(Co2Est$`Carbon Dioxide (ppm)`, start = c(1958,1), frequency = 12)
+print(co2ts)
+autoplot(co2ts, ts.colour = "blue", ts.linetype = "dashed")
+
+```
+En base al analisis de tiempo general podemos determinar que el aumento de Co2 no es estacionario, sino que sigue en incremento constante en base al tiempo transcurrido 
+
+```{r}
+diffco2<-diff(co2ts)
+boxplot(diffco2~cycle(diffco2))
+```
+
+Gracias a la funcion Diffco2 podemos observar en que meses del año sucede una mayor emision de Co2 los cuales son Enero, Abril, Noviembre y Diciembre (1,4,11 y 12) mientras que en julio, agosto y septiembre la emision de estos baja.
+
+```{r}
+forecast1<-forecast(co2ts, level = c(95), h = 50)
+autoplot(forecast1)
+```
+
+Y gracias al analisis con la herramienta de forecast podemos predecir que para los años siguientes a la toma de datos se ha incrementado de manera constante la emision de Co2
+
